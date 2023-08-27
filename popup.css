@@ -1,0 +1,127 @@
+html,
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  width: 24rem;
+  background-color: rgb(65, 65, 65);
+}
+
+.platform-section {
+  height: 2rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-bottom: 0.125rem solid rgb(0, 0, 0);
+}
+
+.platform-section > div:not(:last-child) {
+  border-right: 0.125rem solid rgb(0, 0, 0);
+}
+
+.twitch-section,
+.youtube-section {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+}
+
+.twitch-section:hover,
+.youtube-section:hover {
+  color: rgb(199, 199, 199);
+}
+
+.twitch-section {
+  background-color: #9146ff;
+}
+
+.twitch-section:hover {
+  background-color: #5b3ba1;
+}
+
+.youtube-section {
+  background-color: #b2071d;
+}
+
+.youtube-section:hover {
+  background-color: #750514;
+}
+
+.content {
+  display: flex;
+  min-height: 4rem;
+  max-height: 20rem;
+  align-items: center;
+  flex-direction: column;
+  background-color: rgb(0, 0, 0);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.login-button {
+  margin: auto;
+  border-radius: 0.5rem;
+  border: 0.25rem solid black;
+  width: 6rem;
+  height: 2rem;
+  background-color: rgb(150, 150, 150);
+}
+
+.login-button:hover {
+  background-color: rgb(87, 87, 87);
+}
+
+.stream-container {
+  width: 100%;
+  min-height: 5rem;
+  max-height: 5rem;
+  cursor: pointer;
+  background-color: rgb(31, 31, 31);
+  border-bottom: 0.0675rem solid rgb(54, 54, 54);
+  display: flex;
+}
+
+.stream-container:hover {
+  background-color: rgb(49, 49, 49);
+}
+
+.stream-thumbnail {
+  height: 80;
+  width: 80;
+  padding: 0.5rem;
+}
+
+.stream-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.stream-title {
+  width: 14rem;
+  font-size: 10pt;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  color: white;
+}
+
+.stream-view-count {
+  font-size: 8pt;
+  color: white;
+}
+
+.stream-channel-name {
+  font-size: 10pt;
+  color: white;
+}
+
+.stream-channel-name {
+  font-size: 8pt;
+  color: white;
+}

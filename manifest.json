@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "who-is-live",
+  "description": "View your followed live channels on Twitch and Youtube",
+  "version": "1.0",
+
+  "permissions": ["identity", "storage"],
+  "background": { "scripts": ["background/auth.js", "background/streams.js"] },
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/page-16.png",
+      "32": "icons/page-32.png"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": { "id": "{66bba0bb-aa0e-411e-a1bf-6b236c7b2709}" }
+  }
+}
