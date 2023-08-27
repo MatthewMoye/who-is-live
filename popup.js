@@ -1,12 +1,11 @@
 const contentSection = document.getElementById("content");
 
 const loadContent = () => {
-  const loginBtn = document.getElementById("login-button");
-  if (loginBtn) contentSection.removeChild(loginBtn);
   const storageItems = [
     "twitchIsValidated",
     "twitchAccessToken",
     "twitchStreams",
+    "selectedPlatform",
   ];
   chrome.storage.local.get(storageItems, (res) => {
     if (res.twitchStreams) {
@@ -43,7 +42,7 @@ const loadContent = () => {
         streamDetails.appendChild(channel);
 
         const category = document.createElement("span");
-        category.setAttribute("class", "stream-channel-name");
+        category.setAttribute("class", "stream-game-name");
         category.innerHTML = stream.gameName;
         streamDetails.appendChild(category);
 
@@ -60,8 +59,7 @@ const loadContent = () => {
       loginButton.innerHTML = "Authenticate";
       loginButton.onclick = () =>
         chrome.runtime.sendMessage({ message: "fetch-twitch-auth-token" });
-
-      contentSection.appendChild(loginButton);
+      contentSection.replaceChildren(loginButton);
     }
   });
 };
