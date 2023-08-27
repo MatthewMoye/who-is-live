@@ -1,4 +1,5 @@
-const APP_TOKEN = "APP_TOKEN";
+const TWITCH_APP_TOKEN = "TWITCH_APP_TOKEN";
+const YOUTUBE_CLIENT_ID = "YOUTUBE_CLIENT_ID";
 const redirectURL = chrome.identity.getRedirectURL();
 
 const handleTwitchUnauthorized = () => {
@@ -26,7 +27,7 @@ const validateTwitchToken = async () => {
             twitchIsValidated: true,
             twitchUserId: response["user_id"],
           });
-          getFollowedStreams();
+          getLiveTwitchStreams();
         }
       })
       .catch((error) => {
@@ -45,7 +46,7 @@ const storeTwitchToken = (url) => {
 const getTwitchAuth = () => {
   const authPage =
     `https://id.twitch.tv/oauth2/authorize` +
-    `?client_id=${APP_TOKEN}` +
+    `?client_id=${TWITCH_APP_TOKEN}` +
     `&response_type=token` +
     `&redirect_uri=${redirectURL}` +
     "&scope=user:read:follows&force_verify=true";
@@ -55,11 +56,32 @@ const getTwitchAuth = () => {
   );
 };
 
+const storeYoutubeToken = (url) => {
+  const token = url.split("#")[1].split("=")[1].split("&")[0];
+  chrome.storage.local.set({ youtubeAccessToken: token });
+  getLiveYoutubeStreams();
+};
+
+const getYoutubeAuth = () => {
+  const authPage =
+    `https://accounts.google.com/o/oauth2/v2/auth` +
+    `?client_id=${YOUTUBE_CLIENT_ID}` +
+    `&response_type=token` +
+    `&redirect_uri=${redirectURL}` +
+    "&scope=https://www.googleapis.com/auth/youtube.readonly";
+  chrome.identity.launchWebAuthFlow(
+    { interactive: true, url: authPage },
+    storeYoutubeToken
+  );
+};
+
 setInterval(validateTwitchToken, 1000 * 60 * 60);
 validateTwitchToken();
 
 chrome.runtime.onMessage.addListener((request) => {
   if (request.message === "fetch-twitch-auth-token") {
     getTwitchAuth();
+  } else if (request.message === "fetch-youtube-auth-token") {
+    getYoutubeAuth();
   }
 });

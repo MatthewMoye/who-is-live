@@ -1,4 +1,4 @@
-const getFollowedStreams = async () => {
+const getLiveTwitchStreams = async () => {
   const storageItems = [
     "twitchIsValidated",
     "twitchAccessToken",
@@ -12,7 +12,7 @@ const getFollowedStreams = async () => {
     fetch(followUrl, {
       headers: {
         Authorization: `Bearer ${res.twitchAccessToken}`,
-        "Client-ID": APP_TOKEN,
+        "Client-ID": TWITCH_APP_TOKEN,
       },
     })
       .then((response) => {
@@ -41,8 +41,31 @@ const getFollowedStreams = async () => {
   });
 };
 
+const getLiveYoutubeStreams = () => {
+  chrome.storage.local.get("youtubeAccessToken", (res) => {
+    if (!res.youtubeAccessToken) return;
+    const followUrl =
+      "https://www.googleapis.com/youtube/v3/subscriptions?part=contentDetails&mine=true";
+    fetch(followUrl, {
+      headers: { Authorization: `Bearer ${res.youtubeAccessToken}` },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((response) => {
+        console.log(response);
+        chrome.runtime.sendMessage({ message: "refresh-page" });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  });
+};
+
 chrome.runtime.onMessage.addListener((request) => {
   if (request.message === "refresh-twitch-streams") {
-    getFollowedStreams();
+    getLiveTwitchStreams();
+  } else if (request.message === "refresh-youtube-streams") {
+    getLiveYoutubeStreams();
   }
 });

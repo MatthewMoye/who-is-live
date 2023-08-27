@@ -1,11 +1,34 @@
+const twitchButton = document.getElementById("twitch-button");
+const youtubeButton = document.getElementById("youtube-button");
 const contentSection = document.getElementById("content");
 
-const loadContent = () => {
+const handleButtonSetup = () => {
+  chrome.storage.local.get("selectedPlatform", (res) => {
+    if (res.selectedPlatform === "TWITCH") {
+      twitchButton.style.pointerEvents = "none";
+      youtubeButton.style.pointerEvents = null;
+    } else if (res.selectedPlatform === "YOUTUBE") {
+      twitchButton.style.pointerEvents = null;
+      youtubeButton.style.pointerEvents = "none";
+    }
+  });
+};
+
+const createLoginButton = (platform) => {
+  const loginButton = document.createElement("button");
+  loginButton.setAttribute("class", "login-button");
+  loginButton.setAttribute("id", "login-button");
+  loginButton.innerHTML = "Authenticate";
+  loginButton.onclick = () =>
+    chrome.runtime.sendMessage({ message: `fetch-${platform}-auth-token` });
+  contentSection.replaceChildren(loginButton);
+};
+
+const loadTwitchContent = () => {
   const storageItems = [
     "twitchIsValidated",
     "twitchAccessToken",
     "twitchStreams",
-    "selectedPlatform",
   ];
   chrome.storage.local.get(storageItems, (res) => {
     if (res.twitchStreams) {
@@ -52,23 +75,49 @@ const loadContent = () => {
         streamDetails.appendChild(viewCount);
       });
       contentSection.replaceChildren(...streamList);
-    } else if (!res.twitchIsValidated || !res.twitchAccessToken) {
-      const loginButton = document.createElement("button");
-      loginButton.setAttribute("class", "login-button");
-      loginButton.setAttribute("id", "login-button");
-      loginButton.innerHTML = "Authenticate";
-      loginButton.onclick = () =>
-        chrome.runtime.sendMessage({ message: "fetch-twitch-auth-token" });
-      contentSection.replaceChildren(loginButton);
-    }
+    } else if (!res.twitchIsValidated || !res.twitchAccessToken)
+      createLoginButton("twitch");
   });
 };
 
 const refreshTwitchStreams = () => {
   chrome.runtime.sendMessage({ message: "refresh-twitch-streams" });
 };
-
 setInterval(refreshTwitchStreams, 1000 * 10);
+
+const loadYoutubeContent = () => {
+  const storageItems = ["youtubeAccessToken"];
+  chrome.storage.local.get(storageItems, (res) => {
+    if (!res.youtubeAccessToken) createLoginButton("youtube");
+  });
+};
+
+const refreshYoutubeStreams = () => {
+  chrome.runtime.sendMessage({ message: "refresh-youtube-streams" });
+};
+refreshYoutubeStreams();
+// setInterval(refreshYoutubeStreams, 1000 * 10);
+
+const loadContent = () => {
+  handleButtonSetup();
+  chrome.storage.local.get("selectedPlatform", (res) => {
+    if (res.selectedPlatform === "TWITCH") {
+      loadTwitchContent();
+    } else if (res.selectedPlatform === "YOUTUBE") {
+      contentSection.replaceChildren();
+      loadYoutubeContent();
+    }
+  });
+};
+
+const setActiveTab = (platform) => {
+  chrome.storage.local.set({ selectedPlatform: platform });
+  handleButtonSetup();
+  loadContent();
+};
+
+twitchButton.onclick = () => setActiveTab("TWITCH");
+youtubeButton.onclick = () => setActiveTab("YOUTUBE");
 
 chrome.runtime.onMessage.addListener((request) => {
   if (request.message === "refresh-page") {

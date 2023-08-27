@@ -11,6 +11,7 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
+  user-select: none;
   border-bottom: 0.125rem solid rgb(0, 0, 0);
 }
 
@@ -18,8 +19,8 @@ body {
   border-right: 0.125rem solid rgb(0, 0, 0);
 }
 
-.twitch-section,
-.youtube-section {
+.twitch-button,
+.youtube-button {
   height: 100%;
   width: 100%;
   display: flex;
@@ -29,31 +30,31 @@ body {
   cursor: pointer;
 }
 
-.twitch-section:hover,
-.youtube-section:hover {
+.twitch-button:hover,
+.youtube-button:hover {
   color: rgb(199, 199, 199);
 }
 
-.twitch-section {
+.twitch-button {
   background-color: #9146ff;
 }
 
-.twitch-section:hover {
+.twitch-button:hover {
   background-color: #5b3ba1;
 }
 
-.youtube-section {
+.youtube-button {
   background-color: #b2071d;
 }
 
-.youtube-section:hover {
+.youtube-button:hover {
   background-color: #750514;
 }
 
 .content {
   display: flex;
   min-height: 4rem;
-  max-height: 32rem;
+  max-height: 30rem;
   align-items: center;
   flex-direction: column;
   background-color: rgb(0, 0, 0);
