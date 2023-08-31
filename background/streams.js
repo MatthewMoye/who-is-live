@@ -1,3 +1,5 @@
+chrome.storage.local.set({ selectedPlatform: "TWITCH" });
+
 const getLiveTwitchStreams = async () => {
   const storageItems = [
     "twitchIsValidated",
@@ -30,6 +32,7 @@ const getLiveTwitchStreams = async () => {
             title: stream["title"],
             channelName: stream["user_name"],
             viewerCount: stream["viewer_count"],
+            liveTime: getTimePassed(stream["started_at"]),
           })),
         });
         chrome.runtime.sendMessage({ message: "refresh-page" });
@@ -42,23 +45,64 @@ const getLiveTwitchStreams = async () => {
 };
 
 const getLiveYoutubeStreams = () => {
-  chrome.storage.local.get("youtubeAccessToken", (res) => {
+  let subscriptions = [];
+  chrome.storage.local.get("youtubeAccessToken", async (res) => {
     if (!res.youtubeAccessToken) return;
-    const followUrl =
-      "https://www.googleapis.com/youtube/v3/subscriptions?part=contentDetails&mine=true";
-    fetch(followUrl, {
-      headers: { Authorization: `Bearer ${res.youtubeAccessToken}` },
-    })
-      .then((response) => {
-        return response.json();
+    let nextPageToken = "";
+    const subscriptionsUrl =
+      "https://www.googleapis.com/youtube/v3/subscriptions" +
+      "?part=snippet&maxResults=50&mine=true";
+    while (nextPageToken != null) {
+      const url =
+        subscriptionsUrl + (nextPageToken ? `&pageToken=${nextPageToken}` : "");
+      await fetch(url, {
+        headers: { Authorization: `Bearer ${res.youtubeAccessToken}` },
       })
-      .then((response) => {
-        console.log(response);
-        chrome.runtime.sendMessage({ message: "refresh-page" });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        .then((response) => {
+          if (response.status !== 200) {
+            console.log(response);
+            // handleYoutubeUnauthorized();
+            throw new Error("An error occurred");
+          }
+          return response.json();
+        })
+        .then((response) => {
+          nextPageToken = response.nextPageToken;
+          // console.log(response);
+          subscriptions.push(
+            ...response.items.map((channel) => ({
+              thumbnail: channel.snippet.thumbnails.default.url,
+              channelName: channel.snippet.title,
+              channelId: channel.snippet.resourceId.channelId,
+            }))
+          );
+          chrome.runtime.sendMessage({ message: "refresh-page" });
+        })
+        .catch((error) => {
+          console.error(error);
+          nextPageToken = null;
+        });
+    }
+    subscriptions.map(async (sub) => {
+      const response = await fetch(
+        `https://www.youtube.com/channel/${sub.channelId}/live`
+      )
+        .then((response) => {
+          console.log(response);
+          return response.text();
+        })
+        .then((response) => {
+          console.log(response);
+        });
+      // .catch((error) => {
+      //   console.error(error);
+      // });
+      // let channels = response.split('webCommandMetadata":{"url":"/');
+      // channels.shift();
+      // channels = channels.map((channel) => {
+      //   return channel.split('"webPageType":"WEB_PAGE_TYPE_CHANNEL"')[0];
+    });
+    chrome.storage.local.set({ youtubeSubscriptions: subscriptions });
   });
 };
 

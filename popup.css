@@ -90,20 +90,20 @@ body {
 }
 
 .stream-thumbnail {
-  width: 160px;
+  width: 10rem;
   padding: 0.5rem;
 }
 
 .stream-details {
   height: 6rem;
-  width: 100%;
+  width: calc(100% - 11rem);
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
 }
 
 .stream-title {
-  width: 14rem;
+  width: 100%;
   font-size: 10pt;
   font-weight: 800;
   white-space: nowrap;
@@ -126,7 +126,7 @@ body {
   color: white;
 }
 
-.stream-view-count {
+.stream-stats {
   font-size: 8pt;
   color: white;
 }

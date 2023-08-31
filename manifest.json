@@ -4,7 +4,7 @@
   "description": "View your followed live channels on Twitch and Youtube",
   "version": "1.0",
 
-  "permissions": ["identity", "storage"],
+  "permissions": ["identity", "storage", "https://www.youtube.com/*"],
   "background": {
     "scripts": [
       "background/auth.js",

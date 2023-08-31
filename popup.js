@@ -70,8 +70,9 @@ const loadTwitchContent = () => {
         streamDetails.appendChild(category);
 
         const viewCount = document.createElement("span");
-        viewCount.setAttribute("class", "stream-view-count");
-        viewCount.innerHTML = "viewers: " + stream.viewerCount;
+        viewCount.setAttribute("class", "stream-stats");
+        viewCount.innerHTML =
+          stream.viewerCount + " viewers, " + stream.liveTime;
         streamDetails.appendChild(viewCount);
       });
       contentSection.replaceChildren(...streamList);
@@ -95,7 +96,7 @@ const loadYoutubeContent = () => {
 const refreshYoutubeStreams = () => {
   chrome.runtime.sendMessage({ message: "refresh-youtube-streams" });
 };
-refreshYoutubeStreams();
+// refreshYoutubeStreams();
 // setInterval(refreshYoutubeStreams, 1000 * 10);
 
 const loadContent = () => {

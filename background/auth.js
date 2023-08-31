@@ -56,6 +56,10 @@ const getTwitchAuth = () => {
   );
 };
 
+const handleYoutubeUnauthorized = () => {
+  chrome.storage.local.set({ youtubeAccessToken: null, youtubeStreams: null });
+};
+
 const storeYoutubeToken = (url) => {
   const token = url.split("#")[1].split("=")[1].split("&")[0];
   chrome.storage.local.set({ youtubeAccessToken: token });
