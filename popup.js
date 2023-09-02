@@ -141,8 +141,12 @@ const loadContent = () => {
   handleButtonSetup();
   chrome.storage.local.get("selectedPlatform", (res) => {
     if (res.selectedPlatform === "TWITCH") {
+      twitchButton.setAttribute("class", "twitch-button-active");
+      youtubeButton.setAttribute("class", "youtube-button");
       loadTwitchContent();
     } else if (res.selectedPlatform === "YOUTUBE") {
+      youtubeButton.setAttribute("class", "youtube-button-active");
+      twitchButton.setAttribute("class", "twitch-button");
       contentSection.replaceChildren();
       loadYoutubeContent();
     }

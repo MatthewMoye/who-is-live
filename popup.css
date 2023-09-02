@@ -20,35 +20,36 @@ body {
 }
 
 .twitch-button,
-.youtube-button {
+.youtube-button,
+.twitch-button-active,
+.youtube-button-active {
   height: 100%;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgb(255, 255, 255);
+  color: rgb(199, 199, 199);
   cursor: pointer;
 }
 
-.twitch-button:hover,
-.youtube-button:hover {
-  color: rgb(199, 199, 199);
-}
-
 .twitch-button {
-  background-color: #9146ff;
-}
-
-.twitch-button:hover {
   background-color: #5b3ba1;
 }
 
-.youtube-button {
-  background-color: #b2071d;
+.twitch-button-active,
+.twitch-button:hover {
+  background-color: #9146ff;
+  color: rgb(255, 255, 255);
 }
 
-.youtube-button:hover {
+.youtube-button {
   background-color: #750514;
+}
+
+.youtube-button-active,
+.youtube-button:hover {
+  background-color: #b2071d;
+  color: rgb(255, 255, 255);
 }
 
 .content {
