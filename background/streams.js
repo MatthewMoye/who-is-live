@@ -44,7 +44,7 @@ const getLiveTwitchStreams = async () => {
   });
 };
 
-const getLiveYoutubeStreams = () => {
+const getLiveYoutubeStreams = async () => {
   let subscriptions = [];
   chrome.storage.local.get("youtubeAccessToken", async (res) => {
     if (!res.youtubeAccessToken) return;
@@ -60,15 +60,13 @@ const getLiveYoutubeStreams = () => {
       })
         .then((response) => {
           if (response.status !== 200) {
-            console.log(response);
-            // handleYoutubeUnauthorized();
+            handleYoutubeUnauthorized();
             throw new Error("An error occurred");
           }
           return response.json();
         })
         .then((response) => {
           nextPageToken = response.nextPageToken;
-          // console.log(response);
           subscriptions.push(
             ...response.items.map((channel) => ({
               thumbnail: channel.snippet.thumbnails.default.url,
@@ -83,26 +81,35 @@ const getLiveYoutubeStreams = () => {
           nextPageToken = null;
         });
     }
-    subscriptions.map(async (sub) => {
-      const response = await fetch(
-        `https://www.youtube.com/channel/${sub.channelId}/live`
-      )
-        .then((response) => {
-          console.log(response);
-          return response.text();
-        })
-        .then((response) => {
-          console.log(response);
-        });
-      // .catch((error) => {
-      //   console.error(error);
-      // });
-      // let channels = response.split('webCommandMetadata":{"url":"/');
-      // channels.shift();
-      // channels = channels.map((channel) => {
-      //   return channel.split('"webPageType":"WEB_PAGE_TYPE_CHANNEL"')[0];
-    });
-    chrome.storage.local.set({ youtubeSubscriptions: subscriptions });
+    let liveStreams = [];
+    await Promise.all(
+      subscriptions.map(async (sub) => {
+        await fetch(`https://www.youtube.com/channel/${sub.channelId}/live`)
+          .then((response) => response.text())
+          .then((text) => {
+            const isPlannedStream = text.includes(
+              '"status":"LIVE_STREAM_OFFLINE"'
+            );
+            const isLiveString = text.includes(
+              'link rel="canonical" href="https://www.youtube.com/watch?v='
+            );
+            if (isLiveString && !isPlannedStream) {
+              const title = text
+                .split("<title>")[1]
+                .split(" - YouTube</title>")[0];
+              const liveTime = text
+                .split('"simpleText":"Started streaming ')[1]
+                .split('"}')[0];
+              const viewerCount = text
+                .split('"viewCount":{"runs":[{"text":"')[1]
+                .split('"}')[0];
+              liveStreams.push({ ...sub, title, liveTime, viewerCount });
+            }
+          });
+      })
+    );
+    chrome.storage.local.set({ youtubeStreams: liveStreams });
+    chrome.runtime.sendMessage({ message: "refresh-page" });
   });
 };
 

@@ -90,7 +90,8 @@ body {
 }
 
 .stream-thumbnail {
-  width: 10rem;
+  max-width: 10rem;
+  max-height: 100%;
   padding: 0.5rem;
 }
 

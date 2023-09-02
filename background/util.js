@@ -1,5 +1,4 @@
 const getTimePassed = (startTime) => {
-  console.log(Date.parse(startTime));
   let elapsedTime = Date.now() - Date.parse(startTime);
   elapsedTime = (elapsedTime - (elapsedTime % 1000)) / 1000;
   const ss = elapsedTime % 60;

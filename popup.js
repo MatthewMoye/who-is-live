@@ -84,20 +84,58 @@ const loadTwitchContent = () => {
 const refreshTwitchStreams = () => {
   chrome.runtime.sendMessage({ message: "refresh-twitch-streams" });
 };
-setInterval(refreshTwitchStreams, 1000 * 10);
+setInterval(refreshTwitchStreams, 1000 * 15);
 
 const loadYoutubeContent = () => {
-  const storageItems = ["youtubeAccessToken"];
+  const storageItems = ["youtubeAccessToken", "youtubeStreams"];
   chrome.storage.local.get(storageItems, (res) => {
-    if (!res.youtubeAccessToken) createLoginButton("youtube");
+    if (res.youtubeStreams && res.youtubeAccessToken) {
+      const streamList = [];
+      res.youtubeStreams.map((stream) => {
+        const streamContainer = document.createElement("div");
+        streamContainer.setAttribute("class", "stream-container");
+        streamContainer.onclick = () => {
+          browser.tabs.create({
+            url: `https://www.youtube.com/channel/${stream.channelId}/live`,
+          });
+        };
+        streamList.push(streamContainer);
+
+        const thumbnail = document.createElement("img");
+        thumbnail.setAttribute("class", "stream-thumbnail");
+        thumbnail.src = stream.thumbnail;
+        streamContainer.appendChild(thumbnail);
+
+        const streamDetails = document.createElement("div");
+        streamDetails.setAttribute("class", "stream-details");
+        streamContainer.appendChild(streamDetails);
+
+        const title = document.createElement("span");
+        title.setAttribute("class", "stream-title");
+        title.innerHTML = stream.title;
+        streamDetails.appendChild(title);
+
+        const channel = document.createElement("span");
+        channel.setAttribute("class", "stream-channel-name");
+        channel.innerHTML = stream.channelName;
+        streamDetails.appendChild(channel);
+
+        const viewCount = document.createElement("span");
+        viewCount.setAttribute("class", "stream-stats");
+        viewCount.innerHTML =
+          stream.viewerCount + " viewers, " + stream.liveTime;
+        streamDetails.appendChild(viewCount);
+      });
+      contentSection.replaceChildren(...streamList);
+    } else if (!res.youtubeAccessToken) createLoginButton("youtube");
   });
 };
 
 const refreshYoutubeStreams = () => {
   chrome.runtime.sendMessage({ message: "refresh-youtube-streams" });
 };
-// refreshYoutubeStreams();
-// setInterval(refreshYoutubeStreams, 1000 * 10);
+refreshYoutubeStreams();
+setInterval(refreshYoutubeStreams, 1000 * 15);
 
 const loadContent = () => {
   handleButtonSetup();
