@@ -59,7 +59,9 @@ const getLiveYoutubeStreams = async () => {
         headers: { Authorization: `Bearer ${res.youtubeAccessToken}` },
       })
         .then((response) => {
-          if (response.status !== 200) {
+          if (response.status === 401) {
+            getYoutubeAuth();
+          } else if (response.status !== 200) {
             handleYoutubeUnauthorized();
             throw new Error("An error occurred");
           }
